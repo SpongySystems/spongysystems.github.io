@@ -42,8 +42,35 @@ When navigating in your web browser to '_http://mkingdom.thm:85/_'. you should s
 
 <details>
   <summary>We have reached our first decision point. What’s your first instinct about what to do next? Click here to see if you were right!</summary>
-  If you said to do a directory scan, you are not wrong. However, it is always a good idea to look at the source code first, especially on a defaced website.
+  If you said to do a directory scan, you are not wrong. However, it is always a good idea to look at the source code first, especially on a defaced website. You might find your powerstar just there.
 
+  For this room, there isn't much in the source code. We see that the loaded image is located in the root of the webserver, which doesn't help much. So, we need to perform a directory busting (dirbusting) scan.
+
+  ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/sourcecode1.png)
  
 </details>
+
+![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/think.png)
+
+We run Gobuster to find any directories. I like to start with a small wordlist first, and if it comes up empty, I do an extension search:
+
+> gobuster dir -u http://mkingdom.thm:85 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt
+
+We find one directory immediately. If you let the full scan run, it doesn't show anything else. 
+ 
+> /app                  (Status: 301) [Size: 312] [--> http://mkingdom.thm:85/app/]
+
+When we open this web folder, we only see a green button with "JUMP" on it. Clicking it will redirect us to the main page. (Don't forget to look at the source code as well! But still nothing interesting.)
+
+![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/toads_website.png)
+
+<details>
+   <summary>There are a few things we can check now. Can you think about them all? Click here if you want a hint</summary>
+   In total there are three things I checked:
+   1. What you should already have checked twice this room if you followed my instructions
+   2. That searchbar is intressting
+   3. Checking every link on the page (dirbusting only lead you down a rabbithole)
+</details>
+
+![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/think.png)
 
