@@ -66,11 +66,38 @@ When we open this web folder, we only see a green button with "JUMP" on it. Clic
 
 <details>
    <summary>There are a few things we can check now. Can you think about them all? Click here if you want a hint</summary>
-   In total there are three things I checked:
-   1. What you should already have checked twice this room if you followed my instructions
-   2. That searchbar is intressting
-   3. Checking every link on the page (dirbusting only lead you down a rabbithole)
+   In total, there are three things I checked:
+   
+   1. What you should already have checked twice in this room if you followed my instructions.
+   2. That search bar is intressting.
+   3. Checking every link on the page (dirbusting only led you down a rabbit hole).
 </details>
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/think.png)
+
+1. Source code!
+   
+When we look in the source code now, we can see the Content Management System (CMS) that was used, along with the version. This information will come in handy later.
+
+![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/concrete.png)
+
+2. Search bar might be vulnerable
+
+There is a search bar at the top of the webpage. When we search for something, note how the URL changes to parameters with a search path or query. This might suggest the possibility of a directory traversal attack to gather information about the system running the webserver. Try it out, but don't spend too much time on it, as this version of Concrete CMS is not vulnerable to any parameter tampering attack.
+
+![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/parameters.png)
+
+<details>
+ <summary>Click here if you want to see what I tried to tamper with these parameters</summary>
+   I tried for about 30 minutes to see if I could trick the system into giving me information that it wasn’t supposed to.
+First, I tried to just search for /etc/passwd, but the results were empty. Then, I tried injecting it directly into the URL bar, but still without any result. I tried adding multiple ../ in front of it and ran a custom script to inject multiple payloads automatically. All results were empty.
+
+I also tried to inject the search_path parameter. I was not sure what the [] symbols did in the parameter and could not find much information about it on the internet. I changed it to _search_path[/]=&query=/var/www/html/index.html_ to see if I could set the root of the search path to the root of the system. It did not work and was probably also not going to work like this if the search bar was vulnerable.
+
+Then, I tried some common SQL injection (SQLi) commands, in case the search function was handled by a SQL database. No payloads worked. I captured the POST packet, saved it to a file, and ran it through sqlmap:
+
+ > sqlmap -r request.txt
+
+sqlmap gave back no parameters where injectable, so after all this I came to the comclusion the search bar could not be exploited.
+</details>
 
