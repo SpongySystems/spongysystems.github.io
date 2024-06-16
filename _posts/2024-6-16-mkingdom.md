@@ -29,16 +29,21 @@ If your machine returns an open port, you can still gather more information abou
 Let's-a-go to the website now!**
 
 # Webserver Enumeration
-I always add the server IP to my /etc/hosts file and I recomment you doing the same:
+I always add the server IP to my '_/etc/hosts_' file and I recomment you doing the same:
 
 > sudo nano /etc/hosts
 
 And add this line to your hosts (change the IP to your target machine address!)
 > 10.10.226.51    mkingdom.thm
 
-We get the following page when navigating in the webbrowser to _http://mkingdom.thm:85/_. It looks like the main page was defaced by someone and we have to find another way in to the main website.
+When navigating in your web browser to '_http://mkingdom.thm:85/_'. you should see the following page. It looks like the main page was defaced, so we need to find another way into the main website.
+
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/defaced.png)
 
+<details>
+  <summary>We have reached our first decision point. What’s your first instinct about what to do next? Click here to see if you were right!</summary>
+  If you said to do a directory scan, you are not wrong. However, it is always a good idea to look at the source code first, especially on a defaced website.
 
-
+ 
+</details>
 
