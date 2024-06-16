@@ -272,7 +272,7 @@ The two findings I find interesting are the password to the ```MySQL``` database
 
 ```bash
 su toad
-Password: t________t
+Password: <found password>
 ```
 
 And we are now a user on the system! Let's get that user flag shall we?
