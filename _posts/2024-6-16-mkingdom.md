@@ -169,7 +169,7 @@ But then I remembered that this box is labeled as easy, and people in the Discor
 
 ``
 admin admin.... WRONG!
-admin password.... CORRECT!
+admin pa____rd.... CORRECT! (can you guess the full word?)
 ``
 
 I hit my wall out of frustration and went on to upload my PHP shell.
@@ -272,7 +272,7 @@ The two findings I find interesting are the password to the ```MySQL``` database
 
 ``
 su toad
-Password: toadisthebest
+Password: t________t
 ``
 
 And we are now a user on the system! Let's get that user flag shall we?
@@ -389,7 +389,6 @@ Yup, it is the same. The two ```==``` symbols indicate this string of letters is
 
 ``
 toad@mkingdom:~$ echo $PWD_token | base64 --decode
-ikaTeNTANtES
 ``
 
 We got something that looks like a possible password. But if you try to use this to log in as the root user, it fails. What other user could this be for?
