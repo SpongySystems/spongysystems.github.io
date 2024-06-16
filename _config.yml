@@ -9,7 +9,7 @@ name: SpongySystems TryHackMe writeups
 description: Stuck on TryHackMe? Happy to help with my writeups without spoiling to much.
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: https://github.com/SpongySystems/spongysystems.github.io/blob/master/images/spongescrub_140px.png
+avatar: https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/spongescrub_140px.png
 
 #
 # Flags below are optional
