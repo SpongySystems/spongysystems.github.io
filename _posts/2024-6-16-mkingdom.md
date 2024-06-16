@@ -18,7 +18,7 @@ This first step should be very obvious when you start. Start the machine and Nma
 
 I always start by scanning all ports to avoid missing any services running on uncommon ports:
 
-``` bash
+```bash
 nmap -sS -p 1-65535 10.10.226.51
 ```
 
