@@ -120,7 +120,7 @@ ___
    
  Secondly I tried to just search for /etc/passwd, but the results were empty. Then, I tried injecting it directly into the URL bar, but still without any result. I tried adding multiple ../ in front of it and ran a custom script to inject multiple payloads automatically. All results were empty.
 
-I also tried to inject the search_path parameter. I was not sure what the ``[]`` symbols did in the parameter and could not find much information about it on the internet. I changed it to ``_search_path[/]=&query=/var/www/html/index.html_`` to see if I could set the root of the search path to the root of the system. It did not work and was probably also not going to work like this if the search bar was vulnerable.
+I also tried to inject the search_path parameter. I was not sure what the [] symbols did in the parameter and could not find much information about it on the internet. I changed it to _search_path[/]=&query=/var/www/html/index.html_ to see if I could set the root of the search path to the root of the system. It did not work and was probably also not going to work like this if the search bar was vulnerable.
 
 Then, I tried some common SQL injection (SQLi) commands, in case the search function was handled by a SQL database. No payloads worked. I captured the POST packet, saved it to a file, and ran it through sqlmap:
 
