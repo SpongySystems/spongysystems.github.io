@@ -73,7 +73,7 @@ kramdown:
     span:
       line_numbers: false
     block:
-      line_numbers: true
+      line_numbers: false
       start_line: 1
 
 # Set the Sass partials directory, as we're using @imports
