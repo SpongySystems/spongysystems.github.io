@@ -89,11 +89,7 @@ ___
 
 <details>
    <summary>There are a few things we can check now. Can you think about them all? Click here if you want a hint</summary>
-   In total, there are three things I checked:
-   
-   1. What you should already have checked twice in this room if you followed my instructions.
-   2. That search bar is intressting.
-   3. Checking every link on the page (dirbusting only led you down a rabbit hole).
+   In total, there are three things I checked: What you should already have checked twice in this room if you followed my instructions. Also, that search bar is intressting. and Checking every link on the page (dirbusting only led you down a rabbit hole).
 </details>
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/think.png)
@@ -122,13 +118,7 @@ ___
 
 I also tried to inject the search_path parameter. I was not sure what the [] symbols did in the parameter and could not find much information about it on the internet. I changed it to _search_path[/]=&query=/var/www/html/index.html_ to see if I could set the root of the search path to the root of the system. It did not work and was probably also not going to work like this if the search bar was vulnerable.
 
-Then, I tried some common SQL injection (SQLi) commands, in case the search function was handled by a SQL database. No payloads worked. I captured the POST packet, saved it to a file, and ran it through sqlmap:
-
-``
-sqlmap -r request.txt
-``
-
-sqlmap gave back no parameters where injectable, so after all this I came to the comclusion the search bar could not be exploited.
+Then, I tried some common SQL injection (SQLi) commands, in case the search function was handled by a SQL database. No payloads worked. I captured the POST packet, saved it to a file, and ran it through sqlmap. Sqlmap gave back no parameters where injectable, so after all this I came to the comclusion the search bar could not be exploited.
 
 </details>
 
