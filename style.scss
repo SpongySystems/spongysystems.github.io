@@ -32,7 +32,6 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $helveticaNeue;
-  color: #c8c3bc;
   font-weight: bold;
 
   line-height: 1.7;
@@ -68,11 +67,11 @@ p {
 }
 
 a {
-  color: $blue;
+  color: $lightblue;
   text-decoration: none;
 	cursor: pointer;
   &:hover, &:active {
-    color: $blue;
+    color: $lightblue;
   }
 }
 
@@ -200,7 +199,7 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: $gray;
+  color: #c8c3bc;
   font-size: 16px;
 
   @include mobile {
@@ -223,7 +222,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: #c8c3bc;
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
@@ -252,7 +251,7 @@ nav {
 .post {
   blockquote {
     background-color: #efefef;
-    color: $gray;
+    color: #c8c3bc;
     font-size: 22px;
     font-style: italic;
   }
