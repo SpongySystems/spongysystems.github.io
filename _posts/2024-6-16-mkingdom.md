@@ -18,9 +18,9 @@ This first step should be very obvious when you start. Start the machine and Nma
 
 I always start by scanning all ports to avoid missing any services running on uncommon ports:
 
-``
+```console
 nmap -sS -p 1-65535 10.10.226.51
-``
+```
 
 ![alt text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/nmap1.png)
 
@@ -169,7 +169,7 @@ But then I remembered that this box is labeled as easy, and people in the Discor
 
 ```
 admin admin.... WRONG!
-admin pa____rd.... CORRECT! (can you guess the full word?)
+admin pa____rd.... CORRECT! (can you guess the full password?)
 ```
 
 I hit my wall out of frustration and went on to upload my PHP shell.
