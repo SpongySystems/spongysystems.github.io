@@ -18,21 +18,20 @@ html {
 }
 
 body {
-	background: $white;
+	background: #181a1b;
   font: 18px/1.4 $helvetica;
-  color: $darkGray;
+  color: #c8c3bc;
 }
 
 .container {
   margin: 0 auto;
-  max-width: 740px;
+  max-width: 1200px;
   padding: 0 10px;
   width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $helveticaNeue;
-  color: $darkerGray;
   font-weight: bold;
 
   line-height: 1.7;
@@ -61,7 +60,6 @@ h3 {
 
 h4 {
   font-size: 18px;
-  color: $gray;
 }
 
 p {
@@ -69,11 +67,11 @@ p {
 }
 
 a {
-  color: $blue;
+  color: $lightblue;
   text-decoration: none;
 	cursor: pointer;
   &:hover, &:active {
-    color: $blue;
+    color: $lightblue;
   }
 }
 
@@ -107,7 +105,7 @@ strong, b {
 }
 
 img {
-  max-width: 100%;
+  max-width: 70%;
 }
 
 // Fixes images in popup boxes from Google Translate
@@ -117,16 +115,15 @@ img {
 
 .date {
   font-style: italic;
-  color: $gray;
 }
 
 // Specify the color of the selection
 ::-moz-selection {
-  color: $black;
+  color: #2e2c29;
   background: $lightGray;
 }
 ::selection {
-  color: $black;
+  color: #2e2c29;
   background: $lightGray;
 }
 
@@ -192,7 +189,7 @@ img {
 
 .site-name {
   margin: 0;
-  color: $darkGray;
+  color: #2e2c29;
   cursor: pointer;
   font-family: $helveticaNeue;
   font-weight: 300;
@@ -202,7 +199,7 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: $gray;
+  color: #c8c3bc;
   font-size: 16px;
 
   @include mobile {
@@ -225,7 +222,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: #c8c3bc;
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
@@ -253,10 +250,8 @@ nav {
 
 .post {
   blockquote {
-    margin: 1.8em .8em;
-    border-left: 2px solid $gray;
-    padding: 0.1em 1em;
-    color: $gray;
+    background-color: #2e2c29;
+    color: #c8c3bc;
     font-size: 22px;
     font-style: italic;
   }
@@ -273,6 +268,8 @@ nav {
 
 .wrapper-footer {
   margin-top: 50px;
+  display: inline-block;
+  margin-left: 1rem;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   background-color: $lightGray;

