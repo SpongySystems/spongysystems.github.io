@@ -1,0 +1,65 @@
+---
+layout: post
+title: W1seGuy, hints to get you going
+---
+
+Welcome to [W1seGuy](https://tryhackme.com/r/room/w1seguy), a room that's as beginner-friendly as a puppy with a security badge! It's advertised as easy and focused on decryption. Some programming skills are a must, but don't worry. No need to dust off your ancient spell books just yet.
+
+I whipped up a Python script with just a few lines of code that snags the encryption key faster than you can say "bruteforce." Speaking of which, I initially went down the bruteforcing rabbit hole myself before realizing that, yes, this room is indeed EASY! So, let's dive in and decrypt like pros, shall we?
+
+___
+
+![alt text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/wiseguy/mr wiseguy.png "Let's see how wise you really are!")
+
+First things first, I could just hand you the script and let you grab those flags like free samples at a supermarket. But where's the fun in that? More importantly, you wouldn't learn a thing. I'm here to challenge you to push further on your own by sharing my journey through this room. I started as a full n00b in decryption and learned a ton about the XOR encryption method along the way. I hope you'll allow yourself to do the same by not scrolling all the way at the end right away.
+
+The room starts with the source code, but we'll get back to that later. Let's first netcat into the machine and see what we've got:
+
+```bash
+┌─[user@parrot]─[~]
+└──╼ $netcat 10.10.56.68 1337
+This XOR encoded text has flag 1: 03297b303866005a253c1219420a3c235555202b160f4478293b2d4f231d25154f7b3d2519793935
+What is the encryption key? 
+```
+
+We get a very long integer. Let's look at the beginning of the source code:
+
+```python
+def start(server):
+    res = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+    key = str(res)
+    hex_encoded = setup(server, key)
+```
+
+Here's where the encryption key is generated. It takes all the letters (both lowercase and uppercase) and numbers, then forms a string of 5 characters. This key is then passed on to the setup function:
+
+```python
+def setup(server, key):
+    flag = 'THM{thisisafakeflag}' 
+    xored = ""
+
+    for i in range(0,len(flag)):
+        xored += chr(ord(flag[i]) ^ ord(key[i%len(key)]))
+
+    hex_encoded = xored.encode().hex()
+    return hex_encoded
+```
+
+This is the bread and butter we need to start our decryption journey. An XOR (eXclusive OR) function is used to get a new string that is then hex encoded. This hex-encoded string is what we see on our screen from the netcat call.
+
+Let's us first play around with the XOR operator in python to see how it works.
+
+```python
+print(5 ^ 4) # 1
+print(5 ^ 5) # 0
+print(5 ^ 6) # 3
+print(5 ^ 8) # 13
+```
+
+If you're scratching your head wondering what it does, the output might seem like random gibberish, but there's a method to the madness. XOR is a bitwise operator, meaning it works on the (binary)[https://www.cmu.edu/gelfand/lgc-educational-media/digital-education-modules/dem-documents/new-the-world-of-the-internet-handouts.pdf] level of the given inputs. If both bits on the same location on a input are both 0 or both 1, the output bit is a 0. If one bit is a 1 and the other one a 0, the output bit is a 1. In the examples above, these are the outputs on binary-level:
+
+![alt text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/wiseguy/xor examples.png "numerical input and XOR output")
+
+The nice thing about XOR operations is that they are reversable. I we take the output of the first XOR examples and we do another XOR operation on the second input of the first XOR operation, we get the other input back!
+
+![alt text](https://raw.githubusercontent.com/SpongySystems/spongysystems.github.io/master/images/wiseguy/xor examples backwards.png "numerical input and XOR output")
